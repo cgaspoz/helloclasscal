@@ -1,0 +1,14 @@
+helloclass:
+  username: xyz
+  password: xyz
+
+hangout:
+  user: xyz@gmail.com
+  password: xyz
+  recipients: ['xyz']
+
+mysql:
+  user: xyz
+  password: xyz
+  host: xyz
+  database: xyz
