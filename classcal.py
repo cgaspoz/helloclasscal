@@ -28,7 +28,7 @@ from yaml import load
 from xmpp_bot import send_xmpp
 import dateutil
 
-with open("helloclass.yaml", 'r') as stream:
+with open("config/helloclass.yaml", 'r') as stream:
     config = load(stream)
 
 HELLO = config['helloclass']

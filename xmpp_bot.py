@@ -13,7 +13,7 @@ import sleekxmpp
 
 from yaml import load
 
-with open("helloclass.yaml", 'r') as stream:
+with open("config/helloclass.yaml", 'r') as stream:
     HANGOUT = load(stream)['hangout']
 
 
