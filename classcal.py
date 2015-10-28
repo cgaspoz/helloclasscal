@@ -24,9 +24,13 @@
 import requests
 import mysql.connector
 import datetime
+import pytz
 from yaml import load
 from xmpp_bot import send_xmpp
 import dateutil
+from icalendar import Calendar, Event
+import tempfile
+import os
 
 with open("config/helloclass.yaml", 'r') as stream:
     config = load(stream)
@@ -35,6 +39,8 @@ HELLO = config['helloclass']
 DB = config['mysql']
 
 URL = 'https://www.helloclass.ch/login/'
+
+messages = []
 
 session = requests.Session()
 
@@ -49,8 +55,6 @@ j = r.json()
 
 cnx = mysql.connector.connect(user=DB['user'], password=DB['password'], host=DB['host'], database=DB['database'])
 cursor = cnx.cursor()
-
-#tomorrow = datetime.now().date() + timedelta(days=1)
 
 add_assignment = ("INSERT INTO assignment (idassignment, kind_name, kind, background_color, text, start, end, created, modified) "
                   "VALUES (%(id)s, %(kind_name)s, %(kind)s, %(background_color)s, %(text)s, %(start)s, %(end)s, %(created)s, %(modified)s) "
@@ -71,11 +75,8 @@ for assignment in j['objects']:
         'created': assignment['created'],
         'modified': assignment['modified'],
         }
-
     if dateutil.parser.parse(assignment['modified']) > datetime.datetime.now()-datetime.timedelta(hours=1):
-        msg = "%s\n%s - %s" % (data_assignment['kind_name'], dateutil.parser.parse(data_assignment['start']).strftime("%d.%m.%Y"), data_assignment['text'])
-        send_xmpp(msg)
-    print(data_assignment)
+        messages.append("%s\n%s - %s" % (data_assignment['kind_name'], dateutil.parser.parse(data_assignment['start']).strftime("%d.%m.%Y"), data_assignment['text']))
     # Insert new assignment
     cursor.execute(add_assignment, data_assignment)
     for assignment_file in assignment['files']:
@@ -92,4 +93,36 @@ for assignment in j['objects']:
     # Make sure data is committed to the database
     cnx.commit()
 cursor.close()
+
+cal = Calendar()
+cal.add('prodid', '-//Hello Class Yann//yann.ga-fl.net//')
+cal.add('version', '2.0')
+
+cursor = cnx.cursor()
+
+query = ("SELECT idassignment, kind_name, kind, text, start, end, modified FROM assignment "
+         "WHERE start > %s")
+
+start_date = datetime.datetime.now()-datetime.timedelta(weeks=1)
+
+cursor.execute(query, (start_date, ))
+
+for (idassignment, kind_name, kind, text, start, end, modified) in cursor:
+    event = Event()
+    event.add('summary', "%s - %s" % (kind_name, text))
+    event.add('dtstart', start)
+    event.add('dtend', end)
+    event.add('dtstamp', modified)
+    event['uid'] = '%s/yann@ga-fl.net' % idassignment
+    cal.add_component(event)
+
+cursor.close()
 cnx.close()
+
+f = open('helloyann.ics', 'wb')
+f.write(cal.to_ical())
+f.close()
+
+if len(messages) > 0:
+    for msg in messages:
+        send_xmpp(msg)
