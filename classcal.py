@@ -32,7 +32,10 @@ from icalendar import Calendar, Event
 import tempfile
 import os
 
-with open("config/helloclass.yaml", 'r') as stream:
+
+CURRENT_PATH = os.path.dirname(os.path.abspath(__file__))
+
+with open(os.path.join(CURRENT_PATH, 'config', 'helloclass.yaml'), 'r') as stream:
     config = load(stream)
 
 HELLO = config['helloclass']
@@ -119,7 +122,7 @@ for (idassignment, kind_name, kind, text, start, end, modified) in cursor:
 cursor.close()
 cnx.close()
 
-f = open('helloyann.ics', 'wb')
+f = open(HELLO['ics'], 'wb')
 f.write(cal.to_ical())
 f.close()
 

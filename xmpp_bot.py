@@ -10,10 +10,12 @@
 """
 
 import sleekxmpp
-
 from yaml import load
+import os
 
-with open("config/helloclass.yaml", 'r') as stream:
+CURRENT_PATH = os.path.dirname(os.path.abspath(__file__))
+
+with open(os.path.join(CURRENT_PATH, 'config', 'helloclass.yaml'), 'r') as stream:
     HANGOUT = load(stream)['hangout']
 
 
