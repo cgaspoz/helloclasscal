@@ -124,17 +124,18 @@ def generate_ics():
 session = requests.Session()
 session.get(URL)  # Retrieve the CSRF token first
 csrftoken = session.cookies['csrftoken']
-print(session.cookies)
 
 login_data = dict(username=HELLO['username'], password=HELLO['password'], csrfmiddlewaretoken=csrftoken)
-session.post(URL, data=login_data, headers=dict(Referer=URL))
+r = session.post(URL, data=login_data, headers=dict(Referer=URL))
 
 r = session.get('https://www.helloclass.ch/api/v1/assignment/?limit=100&offset=0&start__gte=%s&year_subject__in=2451' % (datetime.datetime.now()-datetime.timedelta(weeks=1)).strftime("%Y-%m-%d"))
 
 if r.status_code == 200:
     save_json(r.json())
+elif r.status_code == 401:
+    messages.append("ERROR-%s-HTTP 401 Unauthorized" % datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
 else:
-    messages.append("ERROR--Unable to connect to Hello Class")
+    messages.append("ERROR-%s-Unable to connect to Hello Class (HTTP %s)" % (datetime.datetime.now().strftime("%Y-%m-%d %H:%M"), r.status_code))
 
 if len(messages) > 0:
     for msg in messages:
