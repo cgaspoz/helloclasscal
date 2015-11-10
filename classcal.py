@@ -29,9 +29,17 @@ from xmpp_bot import send_xmpp
 import dateutil
 from icalendar import Calendar, Event
 import os
+import pickle
 
 
 CURRENT_PATH = os.path.dirname(os.path.abspath(__file__))
+
+try:
+    hellocron = pickle.load(open(os.path.join(CURRENT_PATH, 'config', 'helloclass.pickle'), 'rb'))
+    LAST_UPDATE = hellocron['last_update']
+except:
+    LAST_UPDATE = datetime.datetime.now()-datetime.timedelta(days=2)
+
 
 with open(os.path.join(CURRENT_PATH, 'config', 'helloclass.yaml'), 'r') as stream:
     config = load(stream)
@@ -67,7 +75,7 @@ def save_json(j):
             'created': assignment['created'],
             'modified': assignment['modified'],
             }
-        if dateutil.parser.parse(assignment['modified']) > datetime.datetime.now()-datetime.timedelta(hours=1):
+        if dateutil.parser.parse(assignment['modified']) > LAST_UPDATE:
             messages.append("%s\n%s - %s" % (data_assignment['kind_name'], dateutil.parser.parse(data_assignment['start']).strftime("%d.%m.%Y"), data_assignment['text']))
         # Insert new assignment
         cursor.execute(add_assignment, data_assignment)
@@ -140,3 +148,5 @@ else:
 if len(messages) > 0:
     for msg in messages:
         send_xmpp(msg)
+
+pickle.dump({'last_update': datetime.datetime.now()}, open(os.path.join(CURRENT_PATH, 'config', 'helloclass.pickle'), 'wb'))
