@@ -60,6 +60,7 @@ def generate_web():
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0"/>
   <meta name="mobile-web-app-capable" content="yes">
   <title>Hello Class</title>
+  <link rel="manifest" href="materialize/manifest.json">
   <!-- CSS  -->
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link href="materialize/css/materialize.min.css" type="text/css" rel="stylesheet" media="screen,projection"/>
