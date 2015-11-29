@@ -106,7 +106,7 @@ def generate_web():
                 open_div = False
             start_day = start - datetime.timedelta(days=start.weekday())
             end_day = start_day + datetime.timedelta(days=4)
-            html += """<h3>Woche %s - %s</h3>""" % (start_day.strftime('%d.%m'), end_day.strftime('%d.%m.%y'))
+            html += """<h4>Woche %s - %s</h4>""" % (start_day.strftime('%d.%m'), end_day.strftime('%d.%m.%y'))
             start_week = start.strftime('%W')
         if start.date() != start_cal.date():
             if open_div:
