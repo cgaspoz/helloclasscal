@@ -87,7 +87,7 @@ def generate_web():
     query = ("SELECT idassignment, kind_name, kind, text, start, end, modified FROM assignment "
              "WHERE start > %s ORDER BY start")
 
-    start_date = datetime.datetime.now()-datetime.timedelta(weeks=1)
+    start_date = datetime.datetime.now()
 
     cursor.execute(query, (start_date, ))
 
@@ -128,7 +128,7 @@ def generate_web():
   <footer class="page-footer orange">
     <div class="footer-copyright">
       <div class="container">
-      Last update: 2015-11-11 23:00
+      Last update: %s
       </div>
     </div>
   </footer>
@@ -137,7 +137,7 @@ def generate_web():
   <script src="materialize/js/materialize.js"></script>
   <script src="js/init.js"></script>
   </body>
-</html>"""
+</html>""" % LAST_UPDATE
 
     f = open(HELLO['html'], 'w')
     f.write(html)
