@@ -69,7 +69,7 @@ def generate_web():
 <body>
 <div class="navbar-fixed">
   <nav class="green lighten-1" role="navigation">
-    <div class="nav-wrapper container"><a id="logo-container" href="#" class="brand-logo">Hello Class Yann</a>
+    <div class="nav-wrapper container"><a id="logo-container" href="#" class="brand-logo">Hello Class</a>
       <ul class="right hide-on-med-and-down">
         <li><a href="#">Past homeworks</a></li>
       </ul>
@@ -94,6 +94,7 @@ def generate_web():
 
     start_cal = start_date - datetime.timedelta(days=1)
     start_month = ""
+    start_week = ""
     open_div = False
 
     for (idassignment, kind_name, kind, text, start, end, modified) in cursor:
@@ -103,6 +104,14 @@ def generate_web():
                 open_div = False
             html += """<h2>%s</h2>""" % start.strftime('%B')
             start_month = start.strftime('%B')
+        if start.date().strftime('%W') != start_week:
+            if open_div:
+                html += "</div></div>"
+                open_div = False
+            start_day = start - datetime.timedelta(days=start.weekday())
+            end_day = start_day + datetime.timedelta(days=4)
+            html += """<h4>Woche %s - %s</h4>""" % (start_day.strftime('%d.%m'), end_day.strftime('%d.%m.%y'))
+            start_week = start.strftime('%W')
         if start.date() != start_cal.date():
             if open_div:
                 html += "</div></div>"
