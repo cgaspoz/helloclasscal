@@ -112,7 +112,10 @@ def generate_web():
             if open_div:
                 html += "</div></div>"
                 open_div = False
-            first_day_week = datetime.datetime.now().date() - datetime.timedelta(days=datetime.datetime.now().weekday())
+            if datetime.datetime.now().weekday() >= 5:
+                first_day_week = datetime.datetime.now().date() + datetime.timedelta(days=7 - datetime.datetime.now().weekday())
+            else:
+                first_day_week = datetime.datetime.now().date() - datetime.timedelta(days=datetime.datetime.now().weekday())
             if (start.date() >= first_day_week) and (start.date() <= first_day_week + datetime.timedelta(days=4)):
                 css = " green lighten-5"
             else:
