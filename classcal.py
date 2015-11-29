@@ -140,6 +140,7 @@ r = session.get('https://www.helloclass.ch/api/v1/assignment/?limit=100&offset=0
 
 if r.status_code == 200:
     save_json(r.json())
+    generate_ics()
 elif r.status_code == 401:
     messages.append("ERROR-%s-HTTP 401 Unauthorized" % datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
 else:
