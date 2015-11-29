@@ -30,6 +30,9 @@ import dateutil
 from icalendar import Calendar, Event
 import os
 import pickle
+import locale
+
+locale.setlocale(locale.LC_ALL, 'de_CH.UTF8')
 
 
 CURRENT_PATH = os.path.dirname(os.path.abspath(__file__))
@@ -93,37 +96,35 @@ def generate_web():
     cursor.execute(query, (start_date, ))
 
     start_cal = start_date - datetime.timedelta(days=1)
-    start_month = ""
     start_week = ""
     open_div = False
 
     for (idassignment, kind_name, kind, text, start, end, modified) in cursor:
-        if start.date().strftime('%B') != start_month:
-            if open_div:
-                html += "</div></div>"
-                open_div = False
-            html += """<h2>%s</h2>""" % start.strftime('%B')
-            start_month = start.strftime('%B')
         if start.date().strftime('%W') != start_week:
             if open_div:
                 html += "</div></div>"
                 open_div = False
             start_day = start - datetime.timedelta(days=start.weekday())
             end_day = start_day + datetime.timedelta(days=4)
-            html += """<h4>Woche %s - %s</h4>""" % (start_day.strftime('%d.%m'), end_day.strftime('%d.%m.%y'))
+            html += """<h3>Woche %s - %s</h3>""" % (start_day.strftime('%d.%m'), end_day.strftime('%d.%m.%y'))
             start_week = start.strftime('%W')
         if start.date() != start_cal.date():
             if open_div:
                 html += "</div></div>"
                 open_div = False
-            html += """<!-- New day -->
-      <div class="divider"></div>
-      <div class="row">
+            first_day_week = datetime.datetime.now().date() - datetime.timedelta(days=datetime.datetime.now().weekday())
+            if (start.date() >= first_day_week) and (start.date() <= first_day_week + datetime.timedelta(days=4)):
+                css = " green lighten-5"
+            else:
+                css = ""
+            if css == "":
+                html += """<div class="divider"></div>"""
+            html += """<div class="row%s">
         <div class="col s2 m2">
             <h5 class="">%s</h5>
             <p class="light">%s.</p>
         </div>
-        <div class="col s10 m10">""" % (start.strftime('%d'), start.strftime('%a'))
+        <div class="col s10 m10">""" % (css, start.strftime('%d'), start.strftime('%a'))
         open_div = True
         html += """
            <div class="card-panel %s lighten-2">%s</div>""" % (KIND[kind], text)
